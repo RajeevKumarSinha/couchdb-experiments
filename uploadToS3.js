@@ -17,17 +17,17 @@ const uploadToS3 = async (glbLink, bucketName, glbName) => {
   // Fetching the file from the provided link
   const response = await axios.get(glbLink, { responseType: 'arraybuffer' });
     // Extracting the file name from the link
-    const fileName = glbLink.split('/').pop();
+    const fileName = glbName.split('/').pop();
   // Setting up the parameters for the S3 upload
   const params = {
     Bucket: bucketName,
     Key: `glb_files/${fileName}`,
     Body: response.data,
     ContentType: 'model/gltf-binary',
-    ACL: 'public-read' // Make the uploaded file publically accessible
+    // ACL: 'public-read' // Make the uploaded file publically accessible
   };
   // Debugging the S3_BUCKET_NAME value
-  console.log('S3_BUCKET_NAME:', process.env.S3_BUCKET_NAME);
+//   console.log('S3_BUCKET_NAME:', process.env.S3_BUCKET_NAME);
   // Uploading the file to S3
   const data = await s3.upload(params).promise();
   // Returning the S3 link of the uploaded file
@@ -37,7 +37,7 @@ const uploadToS3 = async (glbLink, bucketName, glbName) => {
 // Function to process the Excel file
 const processExcelFile = async () => {
   // Reading the Excel file
-  const workbook = XLSX.readFile('output.xlsx');
+  const workbook = XLSX.readFile('wayfair_phase_2_updated (4).csv');
   const sheet_name_list = workbook.SheetNames;
   const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
@@ -53,11 +53,14 @@ const processExcelFile = async () => {
       data[i]['s3 link'] = s3Link;
       // Delaying the process for 3 seconds
       await new Promise(resolve => setTimeout(resolve, 3000));
-      console.log(`${i+1} file Uploaded Successfully`)
+      // Creating a new output.xlsx file
+      const newWorkbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(newWorkbook, XLSX.utils.json_to_sheet(data));
       // Updating the current row of the output.xlsx file with the s3 link
-      XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]])[i]['s3 link'] = s3Link;
+      XLSX.utils.sheet_to_json(newWorkbook.Sheets[sheet_name_list[0]])[i]['s3 link'] = s3Link;
       // Writing the updated Excel file
-      XLSX.writeFile(workbook, 'output.xlsx');
+      XLSX.writeFile(newWorkbook, 'output.xlsx');
+      console.log(`${i+1} file Uploaded Successfully`)
     } else {
       console.log(`S3 link already exists in row ${i+1}, skipping upload`);
     }
@@ -68,3 +71,7 @@ const processExcelFile = async () => {
 // Processing the Excel file
 processExcelFile();
 
+// Inputs from Tushar bhai
+// should i make the s3 link public, or keep them private
+
+// From Sachin bhai, i will need AccessKeyId, secretAccessKey, and created bucket name wayfair.
