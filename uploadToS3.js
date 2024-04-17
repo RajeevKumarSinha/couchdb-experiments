@@ -21,7 +21,7 @@ const uploadToS3 = async (glbLink, bucketName, glbName) => {
   // Setting up the parameters for the S3 upload
   const params = {
     Bucket: bucketName,
-    Key: `glb_files/${fileName}`,
+    Key: `Ikea-glb-files/${fileName}`,
     Body: response.data,
     ContentType: 'model/gltf-binary',
     // ACL: 'public-read' // Make the uploaded file publically accessible
@@ -37,7 +37,7 @@ const uploadToS3 = async (glbLink, bucketName, glbName) => {
 // Function to process the Excel file
 const processExcelFile = async () => {
   // Reading the Excel file
-  const workbook = XLSX.readFile('wayfair_phase_2_updated (4).csv');
+  const workbook = XLSX.readFile('ikea_1713261064.csv');
   const sheet_name_list = workbook.SheetNames;
   const data = XLSX.utils.sheet_to_json(workbook.Sheets[sheet_name_list[0]]);
 
