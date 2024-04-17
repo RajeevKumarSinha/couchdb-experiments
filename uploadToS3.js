@@ -45,6 +45,10 @@ const processExcelFile = async () => {
   for (let i = 0; i < data.length; i++) {
     // Check if the current row already contains an S3 link
     if (!data[i]['s3 link']) {
+      // Check if the glb link is empty, null or undefined
+      if (!data[i]['Glb Link']) {
+        continue;
+      }
       // Fetching the glb link from the current row
       const glbLink = data[i]['Glb Link'];
       // Uploading the glb file to S3 and getting the S3 link
